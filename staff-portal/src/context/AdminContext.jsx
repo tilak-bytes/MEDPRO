@@ -1,0 +1,185 @@
+import { useState, useEffect } from "react";
+import { createContext } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+export const AdminContext = createContext();
+
+export const AdminContextProvider = ({ children }) => {
+  const [aToken, setAToken] = useState(
+    localStorage.getItem("aToken") || ""
+  );
+  const [doctors, setDoctors] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedToken = localStorage.getItem("aToken");
+      if (!storedToken) {
+        setAToken("");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const getAllDoctors = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/all-doctors", {
+        headers: {
+          aToken,
+        },
+      });
+      if (data.success) {
+        setDoctors(data.doctors);
+        // console.log(data.doctors);
+
+        toast.success(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch doctors");
+    }
+  };
+
+  const changeAvailability = async (docId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/change-availability",
+        { docId },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllDoctors();
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to change availability"
+      );
+    }
+  };
+
+  const getAllAppointments = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
+        headers: { aToken },
+      });
+
+      if (data.success) {
+        setAppointments(data.appointments);
+        // console.log(data.appointments);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/cancel-appointment",
+        { appointmentId },
+        { headers: { aToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getAllAppointments();
+        getDashData();
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to cancel appointment"
+      );
+    }
+  };
+
+  const getDashData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
+        headers: { aToken },
+      });
+
+      if (data.success) {
+        setDashData(data.dashData);
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to load Dashboard data"
+      );
+    }
+  };
+
+  const getDoctorUpdates = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/update-requests", {
+        headers: { aToken },
+      });
+      if (data.success) {
+        return data.requests;
+      }
+      return [];
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred fetching requests");
+      return [];
+    }
+  };
+
+  const approveUpdate = async (requestId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/approve-update",
+        { requestId },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        return true;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to approve request");
+      return false;
+    }
+  };
+
+  const rejectUpdate = async (requestId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/reject-update",
+        { requestId },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        return true;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reject request");
+      return false;
+    }
+  };
+
+  const value = {
+    aToken,
+    setAToken,
+    backendUrl,
+    doctors,
+    getAllDoctors,
+    changeAvailability,
+    appointments,
+    setAppointments,
+    getAllAppointments,
+    cancelAppointment,
+    dashData,
+    getDashData,
+    getDoctorUpdates,
+    approveUpdate,
+    rejectUpdate,
+  };
+  return (
+    <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
+  );
+};

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80" fill="none">
+  <!-- Medical Plus / Cross Icon with Circle Gradient -->
+  <defs>
+    <linearGradient id="medproGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E5A4F" />
+      <stop offset="100%" stop-color="#14B8A6" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Logo Mark -->
+  <g filter="url(#shadow)">
+    <rect x="10" y="10" width="60" height="60" rx="16" fill="url(#medproGrad)" />
+    <!-- White Medical Cross -->
+    <rect x="34" y="24" width="12" height="32" rx="3.5" fill="#FFFFFF" />
+    <rect x="24" y="34" width="32" height="12" rx="3.5" fill="#FFFFFF" />
+    <!-- Pulse Accent Dot -->
+    <circle cx="56" cy="22" r="4.5" fill="#C19A6B" />
+  </g>
+
+  <!-- Brand Text -->
+  <text x="86" y="51" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-weight="800" font-size="34" letter-spacing="-0.5px">
+    <tspan fill="#1A2B4C">MED</tspan>
+    <tspan fill="#0E5A4F">PRO</tspan>
+  </text>
+  <text x="88" y="65" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-weight="600" font-size="9.5" fill="#6B7280" letter-spacing="3.5px">
+    HEALTHCARE
+  </text>
+</svg>
